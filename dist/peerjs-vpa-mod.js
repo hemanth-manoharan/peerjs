@@ -7361,7 +7361,10 @@ function (_super) {
   Socket.prototype.start = function (id, token) {
     var _this = this;
 
-    this._id = id;
+    this._id = id; // TODO Need to see if the key here can be a 'public key' with
+    // the 'private key' (of the pair) being on the device
+    // Use 'WebAuthN' here - https://webauthn.guide/#webauthn-api
+
     var wsUrl = this._baseUrl + "&id=" + id + "&token=" + token;
 
     if (!!this._socket || !this._disconnected) {
@@ -10134,4 +10137,4 @@ window.peerjs = exports.peerjs;
 
 window.Peer = peer_1.Peer;
 },{"./util":"BHXf","./peer":"Hxpd"}]},{},["iTK6"], null)
-//# sourceMappingURL=/peerjs.js.map
+//# sourceMappingURL=/peerjs-vpa-mod.js.map

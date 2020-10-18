@@ -1,9 +1,9 @@
 {
-  "name": "peerjs",
+  "name": "peerjs-vpa-mod",
   "version": "1.3.1",
-  "description": "PeerJS client",
-  "main": "./dist/peerjs.min.js",
-  "homepage": "https://github.com/peers/peerjs#readme",
+  "description": "PeerJS client with VPA support",
+  "main": "./dist/peerjs-vpa-mod.min.js",
+  "homepage": "https://github.com/hemanth-manoharan/peerjs#readme",
   "keywords": [
     "peerjs",
     "webrtc",
@@ -12,10 +12,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/peers/peerjs.git"
+    "url": "git+https://github.com/hemanth-manoharan/peerjs.git"
   },
   "bugs": {
-    "url": "https://github.com/peers/peerjs/issues"
+    "url": "https://github.com/hemanth-manoharan/peerjs/issues"
   },
   "files": [
     "dist/*.js",
@@ -29,8 +29,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "parcel build lib/exports.ts --out-file peerjs.min.js",
-    "build-nonminified": "parcel build lib/exports.ts --out-file peerjs.js --no-minify",
+    "build": "parcel build lib/exports.ts --out-file peerjs-vpa-mod.min.js",
+    "build-nonminified": "parcel build lib/exports.ts --out-file peerjs-vpa-mod.js --no-minify",
     "prepublishOnly": "npm run build",
     "test": "mocha -r ts-node/register -r jsdom-global/register test/**/*.ts"
   },
