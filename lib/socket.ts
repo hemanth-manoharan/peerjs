@@ -32,9 +32,11 @@ export class Socket extends EventEmitter {
   start(id: string, token: string): void {
     this._id = id;
 
-    // TODO Need to see if the key here can be a 'public key' with
-    // the 'private key' (of the pair) being on the device
-    // Use 'WebAuthN' here - https://webauthn.guide/#webauthn-api
+    // hemanth-manoharan
+    // TODO Need to see if the token here can be a 'public key' with
+    // the 'private key' (of the pair) being on the client browser
+    // Use Web Crypto API here - https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
+    // Also, send out a signature of {id, timestamp} signed with the private key
     const wsUrl = `${this._baseUrl}&id=${id}&token=${token}`;
 
     if (!!this._socket || !this._disconnected) {
