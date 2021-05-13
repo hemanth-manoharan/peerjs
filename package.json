@@ -1,6 +1,6 @@
 {
   "name": "peerjs-vpa-mod",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "PeerJS client with VPA support",
   "main": "./dist/peerjs-vpa-mod.min.js",
   "homepage": "https://github.com/hemanth-manoharan/peerjs#readme",

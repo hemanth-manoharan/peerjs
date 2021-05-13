@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import logger from "./logger";
-import { SocketEventType, ServerMessageType } from "./enums";
+import { SocketEventType, ServerMessageType, AuthNModel } from "./enums";
 
 /**
  * An abstraction on top of WebSockets to provide fastest
@@ -29,15 +29,20 @@ export class Socket extends EventEmitter {
     this._baseUrl = wsProtocol + host + ":" + port + path + "peerjs?key=" + key;
   }
 
-  start(id: string, token: string): void {
+  start(id: string, authNModel: string, token?: string): void {
     this._id = id;
 
-    // hemanth-manoharan
-    // TODO Need to see if the token here can be a 'public key' with
-    // the 'private key' (of the pair) being on the client browser
-    // Use Web Crypto API here - https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
-    // Also, send out a signature of {id, timestamp} signed with the private key
-    const wsUrl = `${this._baseUrl}&id=${id}&token=${token}`;
+    if (authNModel === AuthNModel.Token && !token) {
+      logger.log('No token supplied. Aborting connection creation');
+      return;
+    }
+
+    // The authNModel will indicate whether to use a simple token model
+    // or a public-key signature based model.
+    // Retaining token model for backward compatibility
+    const wsUrl = (authNModel === AuthNModel.Token) ?
+      `${this._baseUrl}&id=${id}&authNModel=${authNModel}&token=${token}` :
+      `${this._baseUrl}&id=${id}&authNModel=${authNModel}`;
 
     if (!!this._socket || !this._disconnected) {
       return;

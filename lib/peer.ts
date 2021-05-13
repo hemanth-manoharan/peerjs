@@ -9,7 +9,8 @@ import {
   PeerErrorType,
   PeerEventType,
   SocketEventType,
-  ServerMessageType
+  ServerMessageType,
+  AuthNModel
 } from "./enums";
 import { BaseConnection } from "./baseconnection";
 import { ServerMessage } from "./servermessage";
@@ -22,7 +23,10 @@ class PeerOptions implements PeerJSOption {
   port?: number;
   path?: string;
   key?: string;
+  authNModel?: AuthNModel;
   token?: string;
+  timestamp?: number;
+  publicKeyJWK?: string;
   config?: any;
   secure?: boolean;
   pingInterval?: number;
@@ -98,6 +102,14 @@ export class Peer extends EventEmitter {
       userId = id.toString();
     }
 
+    // Inject token only if required
+    if (options.authNModel === AuthNModel.Token) {
+      options = {
+        token: util.randomToken(),
+        ...options
+      }
+    }
+
     // Configurize options
     options = {
       debug: 0, // 1: Errors, 2: Warnings, 3: All logs
@@ -105,10 +117,11 @@ export class Peer extends EventEmitter {
       port: util.CLOUD_PORT,
       path: "/",
       key: Peer.DEFAULT_KEY,
-      token: util.randomToken(),
+      authNModel: AuthNModel.Token,
       config: util.defaultConfig,
       ...options
     };
+
     this._options = options;
 
     // Detect relative URL host.
@@ -208,7 +221,7 @@ export class Peer extends EventEmitter {
   /** Initialize a connection with the server. */
   private _initialize(id: string): void {
     this._id = id;
-    this.socket.start(id, this._options.token!);
+    this.socket.start(id, this._options.authNModel!, this._options.token);
   }
 
   /** Handles messages from the server. */
@@ -222,6 +235,16 @@ export class Peer extends EventEmitter {
         this._lastServerId = this.id;
         this._open = true;
         this.emit(PeerEventType.Open, this.id);
+        break;
+      case ServerMessageType.RegnRequest: 
+        // Server asking for registration creds for new client
+        // TODO Send public key and signature to server here
+        // Type of message should be "Registration Response"
+        break;
+      case ServerMessageType.AuthNRequest:
+        // Server asking for creds for existing client
+        // TODO Send public key and signature to server here
+        // Type of message should be "AuthN Response"
         break;
       case ServerMessageType.Error: // Server error.
         this._abort(PeerErrorType.ServerError, payload.msg);
