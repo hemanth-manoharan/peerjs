@@ -1,6 +1,7 @@
 import { EventEmitter } from "eventemitter3";
 import logger from "./logger";
 import { SocketEventType, ServerMessageType, AuthNModel } from "./enums";
+import { AuthNDetails } from "./authndetails";
 
 /**
  * An abstraction on top of WebSockets to provide fastest
@@ -29,10 +30,10 @@ export class Socket extends EventEmitter {
     this._baseUrl = wsProtocol + host + ":" + port + path + "peerjs?key=" + key;
   }
 
-  start(id: string, authNModel: string, token?: string): void {
+  start(id: string, authNDetails: AuthNDetails): void {
     this._id = id;
 
-    if (authNModel === AuthNModel.Token && !token) {
+    if (authNDetails.model === AuthNModel.Token && !authNDetails.token) {
       logger.log('No token supplied. Aborting connection creation');
       return;
     }
@@ -40,9 +41,9 @@ export class Socket extends EventEmitter {
     // The authNModel will indicate whether to use a simple token model
     // or a public-key signature based model.
     // Retaining token model for backward compatibility
-    const wsUrl = (authNModel === AuthNModel.Token) ?
-      `${this._baseUrl}&id=${id}&authNModel=${authNModel}&token=${token}` :
-      `${this._baseUrl}&id=${id}&authNModel=${authNModel}`;
+    const wsUrl = (authNDetails.model === AuthNModel.Token) ?
+      `${this._baseUrl}&id=${id}&authNModel=${authNDetails.model}&token=${authNDetails.token}` :
+      `${this._baseUrl}&id=${id}&authNModel=${authNDetails.model}`;
 
     if (!!this._socket || !this._disconnected) {
       return;

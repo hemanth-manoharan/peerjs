@@ -7530,12 +7530,12 @@ function (_super) {
     return _this;
   }
 
-  Socket.prototype.start = function (id, authNModel, token) {
+  Socket.prototype.start = function (id, authNDetails) {
     var _this = this;
 
     this._id = id;
 
-    if (authNModel === enums_1.AuthNModel.Token && !token) {
+    if (authNDetails.model === enums_1.AuthNModel.Token && !authNDetails.token) {
       logger_1.default.log('No token supplied. Aborting connection creation');
       return;
     } // The authNModel will indicate whether to use a simple token model
@@ -7543,7 +7543,7 @@ function (_super) {
     // Retaining token model for backward compatibility
 
 
-    var wsUrl = authNModel === enums_1.AuthNModel.Token ? this._baseUrl + "&id=" + id + "&authNModel=" + authNModel + "&token=" + token : this._baseUrl + "&id=" + id + "&authNModel=" + authNModel;
+    var wsUrl = authNDetails.model === enums_1.AuthNModel.Token ? this._baseUrl + "&id=" + id + "&authNModel=" + authNDetails.model + "&token=" + authNDetails.token : this._baseUrl + "&id=" + id + "&authNModel=" + authNDetails.model;
 
     if (!!this._socket || !this._disconnected) {
       return;
@@ -9658,10 +9658,10 @@ function (_super) {
     } // Inject token only if required
 
 
-    if (options.authNModel === enums_1.AuthNModel.Token) {
-      options = __assign({
-        token: util_1.util.randomToken()
-      }, options);
+    if (options.authNDetails.model === enums_1.AuthNModel.Token) {
+      if (!options.authNDetails.token) {
+        options.authNDetails.token = util_1.util.randomToken();
+      }
     } // Configurize options
 
 
@@ -9671,7 +9671,6 @@ function (_super) {
       port: util_1.util.CLOUD_PORT,
       path: "/",
       key: Peer.DEFAULT_KEY,
-      authNModel: enums_1.AuthNModel.Token,
       config: util_1.util.defaultConfig
     }, options);
     _this._options = options; // Detect relative URL host.
@@ -9845,7 +9844,7 @@ function (_super) {
 
   Peer.prototype._initialize = function (id) {
     this._id = id;
-    this.socket.start(id, this._options.authNModel, this._options.token);
+    this.socket.start(id, this._options.authNDetails);
   };
   /** Handles messages from the server. */
 

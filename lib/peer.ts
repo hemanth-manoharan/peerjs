@@ -16,6 +16,7 @@ import { BaseConnection } from "./baseconnection";
 import { ServerMessage } from "./servermessage";
 import { API } from "./api";
 import { PeerConnectOption, PeerJSOption } from "..";
+import { AuthNDetails } from "./authndetails";
 
 class PeerOptions implements PeerJSOption {
   debug?: LogLevel; // 1: Errors, 2: Warnings, 3: All logs
@@ -23,10 +24,7 @@ class PeerOptions implements PeerJSOption {
   port?: number;
   path?: string;
   key?: string;
-  authNModel?: AuthNModel;
-  token?: string;
-  timestamp?: number;
-  publicKeyJWK?: string;
+  authNDetails: AuthNDetails;
   config?: any;
   secure?: boolean;
   pingInterval?: number;
@@ -103,10 +101,9 @@ export class Peer extends EventEmitter {
     }
 
     // Inject token only if required
-    if (options.authNModel === AuthNModel.Token) {
-      options = {
-        token: util.randomToken(),
-        ...options
+    if (options.authNDetails.model === AuthNModel.Token) {
+      if (!options.authNDetails.token) {
+        options.authNDetails.token = util.randomToken(); 
       }
     }
 
@@ -117,7 +114,6 @@ export class Peer extends EventEmitter {
       port: util.CLOUD_PORT,
       path: "/",
       key: Peer.DEFAULT_KEY,
-      authNModel: AuthNModel.Token,
       config: util.defaultConfig,
       ...options
     };
@@ -221,7 +217,7 @@ export class Peer extends EventEmitter {
   /** Initialize a connection with the server. */
   private _initialize(id: string): void {
     this._id = id;
-    this.socket.start(id, this._options.authNModel!, this._options.token);
+    this.socket.start(id, this._options.authNDetails);
   }
 
   /** Handles messages from the server. */
