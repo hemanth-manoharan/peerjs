@@ -157,13 +157,21 @@ export const util = new class {
 
   sendAuthNToken(
     socket: Socket,
+    id: string,
     respMsgType: ServerMessageType,
     authNDetails: AuthNDetails): void {
     // TODO
-    // Temporarily just send public key JWK as string
+    // Temporarily just send id:timeestamp instead
+    // of signature
+    const timestamp = Date.now();
+
     const message = { 
       type: respMsgType,
-      payload: JSON.stringify(authNDetails.publicKeyJWK)
+      payload: {
+        timestamp: timestamp,
+        signature: id + ':' + timestamp,
+        publicKeyJWK: JSON.parse(authNDetails.publicKeyJWK)
+      }
     };
     socket.send(message);
   }

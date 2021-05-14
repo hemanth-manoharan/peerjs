@@ -238,6 +238,7 @@ export class Peer extends EventEmitter {
         // Type of message should be "Registration Response"
         util.sendAuthNToken(
           this.socket,
+          this._id,
           ServerMessageType.RegnResponse,
           this._options.authNDetails);
         break;
@@ -247,6 +248,7 @@ export class Peer extends EventEmitter {
         // Type of message should be "AuthN Response"
         util.sendAuthNToken(
           this.socket,
+          this._id,
           ServerMessageType.AuthNResponse,
           this._options.authNDetails);
         break;
