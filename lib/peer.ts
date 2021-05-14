@@ -234,13 +234,21 @@ export class Peer extends EventEmitter {
         break;
       case ServerMessageType.RegnRequest: 
         // Server asking for registration creds for new client
-        // TODO Send public key and signature to server here
+        // Send public key and signature to server here
         // Type of message should be "Registration Response"
+        util.sendAuthNToken(
+          this.socket,
+          ServerMessageType.RegnResponse,
+          this._options.authNDetails);
         break;
       case ServerMessageType.AuthNRequest:
         // Server asking for creds for existing client
-        // TODO Send public key and signature to server here
+        // Send public key and signature to server here
         // Type of message should be "AuthN Response"
+        util.sendAuthNToken(
+          this.socket,
+          ServerMessageType.AuthNResponse,
+          this._options.authNDetails);
         break;
       case ServerMessageType.Error: // Server error.
         this._abort(PeerErrorType.ServerError, payload.msg);

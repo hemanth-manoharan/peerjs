@@ -56,7 +56,9 @@ export enum ServerMessageType {
   Answer = "ANSWER",
   Open = "OPEN", // The connection to the server is open.
   RegnRequest = "REGN-REQ", // Server asking for registration creds for new client
+  RegnResponse = "REGN-RESP",
   AuthNRequest = "AUTHN-REQ", // Server asking for creds for existing client
+  AuthNResponse = "AUTHN-RESP",
   Error = "ERROR", // Server error.
   IdTaken = "ID-TAKEN", // The selected ID is taken.
   InvalidKey = "INVALID-KEY", // The given API key cannot be found.

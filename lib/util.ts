@@ -1,6 +1,9 @@
 import * as BinaryPack from "peerjs-js-binarypack";
 import { Supports } from './supports';
 import { UtilSupportsObj } from '..';
+import { Socket } from './socket';
+import { ServerMessageType } from './enums';
+import { AuthNDetails } from './authndetails';
 
 const DEFAULT_CONFIG = {
   iceServers: [
@@ -150,5 +153,18 @@ export const util = new class {
 
   isSecure(): boolean {
     return location.protocol === "https:";
+  }
+
+  sendAuthNToken(
+    socket: Socket,
+    respMsgType: ServerMessageType,
+    authNDetails: AuthNDetails): void {
+    // TODO
+    // Temporarily just send public key
+    const message = JSON.stringify({ 
+      type: respMsgType,
+      payload: authNDetails.publicKey
+    });
+    socket.send(message);
   }
 }
