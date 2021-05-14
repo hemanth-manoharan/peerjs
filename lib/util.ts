@@ -160,11 +160,11 @@ export const util = new class {
     respMsgType: ServerMessageType,
     authNDetails: AuthNDetails): void {
     // TODO
-    // Temporarily just send public key
-    const message = JSON.stringify({ 
+    // Temporarily just send public key JWK as string
+    const message = { 
       type: respMsgType,
-      payload: authNDetails.publicKey
-    });
+      payload: JSON.stringify(authNDetails.publicKeyJWK)
+    };
     socket.send(message);
   }
 }

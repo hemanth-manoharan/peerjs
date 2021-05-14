@@ -7,8 +7,8 @@ export class AuthNDetails {
   token?: string;
 
   // Used for AuthNModel.Signature
-  publicKey?: string;
-  privateKey?: string;
+  publicKeyJWK?: string;
+  privateKey?: CryptoKey;
 
   constructor(model: AuthNModel) {
     this.model = model;
