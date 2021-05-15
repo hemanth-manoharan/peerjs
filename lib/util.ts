@@ -160,19 +160,44 @@ export const util = new class {
     id: string,
     respMsgType: ServerMessageType,
     authNDetails: AuthNDetails): void {
-    // TODO
-    // Temporarily just send id:timeestamp instead
-    // of signature
     const timestamp = Date.now();
 
-    const message = { 
-      type: respMsgType,
-      payload: {
-        timestamp: timestamp,
-        signature: id + ':' + timestamp,
-        publicKeyJWK: JSON.parse(authNDetails.publicKeyJWK)
+    const signaturePromise = this._sign(
+      authNDetails.privateKey,
+      id + ':' + timestamp
+    );
+
+    signaturePromise.then(
+      function(signature) {
+        const uint8Array = new Uint8Array(signature);
+        const message = { 
+          type: respMsgType,
+          payload: {
+            timestamp: timestamp,
+            signature: Array.from(uint8Array),
+            publicKeyJWK: JSON.parse(authNDetails.publicKeyJWK)
+          }
+        };
+        socket.send(message);    
+      },
+      function(error) {
+        console.log(`Error computing signature: ${error}`);
       }
-    };
-    socket.send(message);
+    );
+
+  }
+
+  private async _sign(
+    privateKey: CryptoKey,
+    data: string) : Promise<ArrayBuffer> {
+    const enc = new TextEncoder();
+    return await window.crypto.subtle.sign(
+      {
+        name: "ECDSA",
+        hash: {name: "SHA-384"},
+      },
+      privateKey,
+      enc.encode(data)
+    );
   }
 }
