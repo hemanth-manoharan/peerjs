@@ -15,8 +15,7 @@ import {
 import { BaseConnection } from "./baseconnection";
 import { ServerMessage } from "./servermessage";
 import { API } from "./api";
-import { PeerConnectOption, PeerJSOption } from "..";
-import { AuthNDetails } from "./authndetails";
+import { PeerConnectOption, PeerJSOption, AuthNDetails } from "..";
 
 class PeerOptions implements PeerJSOption {
   debug?: LogLevel; // 1: Errors, 2: Warnings, 3: All logs

@@ -138,10 +138,14 @@ declare namespace Peer {
     secure?: boolean;
     config?: RTCConfiguration;
     debug?: number;
-    authNModel?: AuthNModel;
+    authNDetails?: AuthNModel;
+  }
+
+  interface AuthNDetails {
+    model: AuthNModel;
     token?: string;
-    timestamp?: number;
     publicKeyJWK?: string;
+    privateKey?: CryptoKey;
   }
 
   interface PeerConnectOption {

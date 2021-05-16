@@ -1,6 +1,8 @@
 import { AuthNModel } from "./enums";
+import { AuthNDetails } from "..";
 
-export class AuthNDetails {
+
+export class AuthNDetailsImpl implements AuthNDetails {
   model: AuthNModel;
 
   // Used for AuthNModel.Token
