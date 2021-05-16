@@ -55,10 +55,19 @@ export enum ServerMessageType {
   Offer = "OFFER",
   Answer = "ANSWER",
   Open = "OPEN", // The connection to the server is open.
+  RegnRequest = "REGN-REQ", // Server asking for registration creds for new client
+  RegnResponse = "REGN-RESP",
+  AuthNRequest = "AUTHN-REQ", // Server asking for creds for existing client
+  AuthNResponse = "AUTHN-RESP",
   Error = "ERROR", // Server error.
   IdTaken = "ID-TAKEN", // The selected ID is taken.
   InvalidKey = "INVALID-KEY", // The given API key cannot be found.
   Leave = "LEAVE", // Another peer has closed its connection to this peer.
   Expire = "EXPIRE" // The offer sent to a peer has expired without response.
 
+}
+
+export enum AuthNModel {
+  Token = "TOKEN",
+  Signature = "SIGNATURE"
 }

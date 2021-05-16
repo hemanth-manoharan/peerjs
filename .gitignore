@@ -21,3 +21,5 @@ test/output
 .tscache
 test/public
 .vscode/
+
+**/.DS_Store

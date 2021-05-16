@@ -9,12 +9,13 @@ import {
   PeerErrorType,
   PeerEventType,
   SocketEventType,
-  ServerMessageType
+  ServerMessageType,
+  AuthNModel
 } from "./enums";
 import { BaseConnection } from "./baseconnection";
 import { ServerMessage } from "./servermessage";
 import { API } from "./api";
-import { PeerConnectOption, PeerJSOption } from "..";
+import { PeerConnectOption, PeerJSOption, AuthNDetails } from "..";
 
 class PeerOptions implements PeerJSOption {
   debug?: LogLevel; // 1: Errors, 2: Warnings, 3: All logs
@@ -22,7 +23,7 @@ class PeerOptions implements PeerJSOption {
   port?: number;
   path?: string;
   key?: string;
-  token?: string;
+  authNDetails: AuthNDetails;
   config?: any;
   secure?: boolean;
   pingInterval?: number;
@@ -98,6 +99,13 @@ export class Peer extends EventEmitter {
       userId = id.toString();
     }
 
+    // Inject token only if required
+    if (options.authNDetails.model === AuthNModel.Token) {
+      if (!options.authNDetails.token) {
+        options.authNDetails.token = util.randomToken(); 
+      }
+    }
+
     // Configurize options
     options = {
       debug: 0, // 1: Errors, 2: Warnings, 3: All logs
@@ -105,10 +113,10 @@ export class Peer extends EventEmitter {
       port: util.CLOUD_PORT,
       path: "/",
       key: Peer.DEFAULT_KEY,
-      token: util.randomToken(),
       config: util.defaultConfig,
       ...options
     };
+
     this._options = options;
 
     // Detect relative URL host.
@@ -208,7 +216,7 @@ export class Peer extends EventEmitter {
   /** Initialize a connection with the server. */
   private _initialize(id: string): void {
     this._id = id;
-    this.socket.start(id, this._options.token!);
+    this.socket.start(id, this._options.authNDetails);
   }
 
   /** Handles messages from the server. */
@@ -222,6 +230,26 @@ export class Peer extends EventEmitter {
         this._lastServerId = this.id;
         this._open = true;
         this.emit(PeerEventType.Open, this.id);
+        break;
+      case ServerMessageType.RegnRequest: 
+        // Server asking for registration creds for new client
+        // Send public key and signature to server here
+        // Type of message should be "Registration Response"
+        util.sendAuthNToken(
+          this.socket,
+          this._id,
+          ServerMessageType.RegnResponse,
+          this._options.authNDetails);
+        break;
+      case ServerMessageType.AuthNRequest:
+        // Server asking for creds for existing client
+        // Send public key and signature to server here
+        // Type of message should be "AuthN Response"
+        util.sendAuthNToken(
+          this.socket,
+          this._id,
+          ServerMessageType.AuthNResponse,
+          this._options.authNDetails);
         break;
       case ServerMessageType.Error: // Server error.
         this._abort(PeerErrorType.ServerError, payload.msg);

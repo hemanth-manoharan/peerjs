@@ -1,6 +1,9 @@
 import * as BinaryPack from "peerjs-js-binarypack";
 import { Supports } from './supports';
 import { UtilSupportsObj } from '..';
+import { Socket } from './socket';
+import { ServerMessageType } from './enums';
+import { AuthNDetails } from './authndetails';
 
 const DEFAULT_CONFIG = {
   iceServers: [
@@ -150,5 +153,51 @@ export const util = new class {
 
   isSecure(): boolean {
     return location.protocol === "https:";
+  }
+
+  sendAuthNToken(
+    socket: Socket,
+    id: string,
+    respMsgType: ServerMessageType,
+    authNDetails: AuthNDetails): void {
+    const timestamp = Date.now();
+
+    const signaturePromise = this._sign(
+      authNDetails.privateKey,
+      id + ':' + timestamp
+    );
+
+    signaturePromise.then(
+      function(signature) {
+        const uint8Array = new Uint8Array(signature);
+        const message = { 
+          type: respMsgType,
+          payload: {
+            timestamp: timestamp,
+            signature: Array.from(uint8Array),
+            publicKeyJWK: JSON.parse(authNDetails.publicKeyJWK)
+          }
+        };
+        socket.send(message);    
+      },
+      function(error) {
+        console.log(`Error computing signature: ${error}`);
+      }
+    );
+
+  }
+
+  private async _sign(
+    privateKey: CryptoKey,
+    data: string) : Promise<ArrayBuffer> {
+    const enc = new TextEncoder();
+    return await window.crypto.subtle.sign(
+      {
+        name: "ECDSA",
+        hash: {name: "SHA-384"},
+      },
+      privateKey,
+      enc.encode(data)
+    );
   }
 }
